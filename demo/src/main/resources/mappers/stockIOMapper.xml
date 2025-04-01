@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.StockIOInterface">
+
+
+
+    <insert id="insertStockIO">
+        insert into jxc_stock_io(stock_io_id,type,sub_type,io_time,operator_id,status,create_time
+        <if test="from_warehouse_id!=null and from_warehouse_id!=''">
+            ,from_warehouse_id
+        </if>
+        <if test="to_warehouse_id!=null and to_warehouse_id!=''">
+            ,to_warehouse_id
+        </if>
+        <if test="remark!=null and remark!=''">
+            ,remark
+        </if>
+        )VALUES (#{stock_io_id},#{type},#{sub_type},#{io_time},#{operator_id},#{status},#{create_time}
+                <if test="from_warehouse_id!=null and from_warehouse_id!=''">
+                    ,#{from_warehouse_id}
+                </if>
+                <if test="to_warehouse_id!=null and to_warehouse_id!=''">
+                    ,#{to_warehouse_id}
+                </if>
+                <if test="remark!=null and remark!=''">
+                    ,#{remark}
+                </if>
+        )
+    </insert>
+    <insert id="insertStockIODetail">
+            insert into jxc_stock_io_detail(detail_id,stock_io_id,material_id,production_date,unit_price,quantity,remark)
+            VALUES
+                <foreach collection="stockIODetail" item="detail" separator=",">
+                (#{detail.detail_id},#{detail.stock_io_id},#{detail.material_id},#{detail.production_date},
+                 #{detail.unit_price},#{detail.quantity},#{detail.remark})
+            </foreach>
+    </insert>
+    <insert id="submitForAuditAdd">
+        INSERT INTO jxc_stock_io_audit(audit_id,stock_io_id,auditor_id,audit_time,audit_status,audit_comment)
+        VALUES (#{audit_id},#{stock_io_id},#{auditor_id},#{audit_time},#{audit_status},#{audit_comment})
+    </insert>
+    <delete id="deleteStockIODetail">
+        DELETE FROM jxc_stock_io_detail WHERE stock_io_id = #{stock_io_id}
+    </delete>
+    <delete id="deleteStockIO">
+        DELETE FROM jxc_stock_io WHERE stock_io_id = #{stock_io_id}
+    </delete>
+    <delete id="removeStockIOAudit">
+        DELETE FROM jxc_stock_io_audit WHERE stock_io_id = #{stock_io_id}
+    </delete>
+    <update id="submit">
+        UPDATE jxc_stock_io SET status = #{status} WHERE stock_io_id = #{stock_io_id}
+    </update>
+    <update id="update">
+        UPDATE jxc_stock_io
+        SET status = #{status},io_time=#{io_time},remark=#{remark},update_time=#{update_time}
+        WHERE stock_io_id = #{stock_io_id}
+    </update>
+    <update id="submitForAuditUpdate">
+        UPDATE jxc_stock_io
+        SET status = #{audit_status}
+        WHERE stock_io_id = #{stock_io_id}
+    </update>
+    <select id="show" resultType="com.example.demo.entity.StockIO">
+        SELECT si.stock_io_id,si.sub_type,si.create_time,si.update_time,si.status,SUM(sid.quantity*sid.unit_price) AS
+        total_price
+        FROM jxc_stock_io si
+        INNER JOIN jxc_stock_io_detail sid ON si.stock_io_id = sid.stock_io_id
+        <where>
+            <if test="stockIO.stock_io_id!=null and stockIO.stock_io_id!=''">
+                AND si.stock_io_id = #{stockIO.stock_io_id}
+            </if>
+            <if test="stockIO.sub_type!=null ">
+                AND si.sub_type = #{stockIO.sub_type}
+            </if>
+            <if test="stockIO.status!=null ">
+                AND si.status = #{stockIO.status}
+            </if>
+            <if test="stockIO.type.toString() == 'IN' ">
+                AND si.to_warehouse_id = #{stockIO.to_warehouse_id}
+            </if>
+            <if test="stockIO.type.toString() == 'OUT' ">
+                AND si.from_warehouse_id = #{stockIO.from_warehouse_id}
+            </if>
+        </where>
+        GROUP BY si.stock_io_id
+        limit #{input.start},#{input.pageSize}
+    </select>
+    <select id="show_count" resultType="java.lang.Long">
+        SELECT COUNT(stock_io_id)
+        FROM jxc_stock_io
+        <where>
+            <if test="stock_io_id!=null and stock_io_id!=''">
+                AND stock_io_id = #{stock_io_id}
+            </if>
+            <if test="sub_type!=null ">
+                AND sub_type = #{sub_type}
+            </if>
+            <if test="status!=null ">
+                AND status = #{status}
+            </if>
+            <if test="type.toString() == 'IN' ">
+                AND to_warehouse_id = #{to_warehouse_id}
+            </if>
+            <if test="type.toString() == 'OUT' ">
+                AND from_warehouse_id = #{from_warehouse_id}
+            </if>
+        </where>
+    </select>
+    <select id="selectStockIOById" resultType="com.example.demo.entity.StockIO">
+        SELECT stock_io_id,type,sub_type,from_warehouse_id,to_warehouse_id,operator_id,io_time,create_time,remark FROM jxc_stock_io
+        WHERE stock_io_id = #{stock_io_id}
+    </select>
+    <select id="selectStockIODetailById" resultType="com.example.demo.entity.StockIODetail">
+        SELECT sid.*,
+               m.material_name,
+               IF(m.unit NOT LIKE '%/%', CONCAT(m.box_quantity, m.unit, '/箱'),
+                  CONCAT(m.unit, '，', m.box_quantity, SUBSTRING(m.unit FROM LOCATE('/', m.unit) + 1),'/箱')) AS volume_per_unit
+        FROM jxc_stock_io_detail sid
+                 INNER JOIN jxc_material m ON sid.material_id = m.material_id
+        WHERE sid.stock_io_id = #{stock_io_id}
+    </select>
+    <select id="auditShow" resultType="com.example.demo.entity.StockIO">
+        SELECT io.stock_io_id, io.sub_type, io.io_time, u.name AS operator_name, SUM(iod.quantity * iod.unit_price) AS total_price
+        FROM jxc_stock_io io
+        INNER JOIN jxc_user u ON io.operator_id = u.id
+        INNER JOIN jxc_stock_io_detail iod ON io.stock_io_id = iod.stock_io_id
+        <where>
+            <if test="stockIO.stock_io_id!=null and stockIO.stock_io_id!=''">
+                AND io.stock_io_id = #{stockIO.stock_io_id}
+            </if>
+            <if test="stockIO.sub_type!=null ">
+                AND io.sub_type = #{stockIO.sub_type}
+            </if>
+            <if test="stockIO.status!=null ">
+                AND io.status = #{stockIO.status}
+            </if>
+            <if test="stockIO.to_warehouse_id!=null and stockIO.to_warehouse_id!='' ">
+                AND io.to_warehouse_id = #{stockIO.to_warehouse_id}
+            </if>
+        </where>
+        GROUP BY io.stock_io_id
+        limit #{input.start},#{input.pageSize}
+    </select>
+    <select id="auditShow_count" resultType="java.lang.Long">
+        SELECT COUNT(stock_io_id)
+        FROM jxc_stock_io
+        <where>
+            <if test="stock_io_id!=null and stock_io_id!=''">
+                AND stock_io_id = #{stock_io_id}
+            </if>
+            <if test="sub_type!=null ">
+                AND sub_type = #{sub_type}
+            </if>
+            <if test="status!=null ">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="getAuditMsg" resultType="com.example.demo.entity.StockIO">
+        SELECT io.stock_io_id,io.sub_type,io.operator_id,io.to_warehouse_id,io.from_warehouse_id,io.io_time,io.remark
+             , w_1.warehouse_name AS to_warehouse_name, w_2.warehouse_name AS from_warehouse_name,u.name AS operator_name
+        FROM jxc_stock_io io
+                 Left JOIN jxc_warehouse w_1 ON io.to_warehouse_id = w_1.warehouse_id
+                 Left JOIN jxc_warehouse w_2 ON io.from_warehouse_id = w_2.warehouse_id
+                 LEFT JOIN jxc_user u ON io.operator_id = u.id
+        WHERE io.stock_io_id = #{stock_io_id}
+    </select>
+    <select id="getAuditDetailMsg" resultType="com.example.demo.entity.StockIODetail">
+        SELECT sid.detail_id,sid.quantity,sid.unit_price,sid.material_id,sid.production_date,
+               m.material_name,c.name AS category_name,m.shelf_life,
+               IF(m.unit NOT LIKE '%/%', CONCAT(m.box_quantity, m.unit, '/箱'),
+                  CONCAT(m.unit, '，', m.box_quantity, SUBSTRING(m.unit FROM LOCATE('/', m.unit) + 1),'/箱')) AS volume_per_unit
+        FROM jxc_stock_io_detail sid
+                INNER JOIN jxc_material m ON sid.material_id = m.material_id
+                INNER  JOIN jxc_category c ON m.category_id = c.id
+        WHERE sid.stock_io_id = #{stock_io_id}
+    </select>
+    <select id="getWarehouseIDByStockIOId" resultType="java.lang.String">
+        SELECT to_warehouse_id FROM jxc_stock_io
+        WHERE stock_io_id = #{stock_io_id}
+    </select>
+
+</mapper>

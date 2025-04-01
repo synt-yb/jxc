@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.StockIODetailInterface">
+
+
+    <select id="selectByStockIOId" resultType="com.example.demo.entity.StockIODetail">
+        SELECT * FROM jxc_stock_io_detail WHERE stock_io_id = #{stock_io_id}
+    </select>
+</mapper>

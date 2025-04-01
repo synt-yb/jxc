@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.MenuInterface">
+
+    <delete id="delete">
+        delete from jxc_menu where id=#{id}
+    </delete>
+    <delete id="clearRoleMenu">
+        delete from jxc_menu_role where role_id=#{id}
+    </delete>
+    <delete id="clearRoleMenu2">
+        delete from jxc_menu_role where menu_id=#{id}
+    </delete>
+
+    <select id="getRoleMenu" resultType="com.example.demo.entity.Menu">
+        select jm.* from jxc_menu_role jmr left join jxc_menu jm on jmr.menu_id = jm.id where jmr.role_id = #{id}
+    </select>
+    <select id="getAll" resultType="com.example.demo.entity.Menu">
+        select * from jxc_menu order by pid,`order`
+    </select>
+    <select id="selectByPid" resultType="com.example.demo.entity.Menu">
+        select * from jxc_menu where pid=#{id}
+    </select>
+    <select id="getMenuByUser" resultType="com.example.demo.entity.Menu">
+        select jm.* from jxc_menu jm where jm.id IN ( select jmr.menu_id from jxc_menu_role jmr
+            left join jxc_role_user jru on jmr.role_id = jru.role_id where jru.user_id=#{id})
+            order by jm.pid,`order`
+    </select>
+
+    <insert id="add">
+        INSERT INTO jxc_menu (id,text,url,pid,icon,`order`,flag) VALUES (#{id},#{text},#{url},#{pid},#{icon},#{order},#{flag})
+    </insert>
+    <insert id="addRoleMenu">
+        INSERT INTO jxc_menu_role (id,menu_id,role_id) VALUES (#{id},#{menu_id},#{role_id})
+    </insert>
+
+    <update id="update">
+        update jxc_menu set text=#{text},url=#{url},icon=#{icon},`order`=#{order} where id=#{id}
+    </update>
+
+</mapper>

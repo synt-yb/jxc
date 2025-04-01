@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.UserInterface">
+    <insert id="add">
+        INSERT INTO jxc_user (id,name,account,password,email,birthday,photo,remark,create_time)
+        VALUES (#{id},#{name},#{account},#{password},#{email},#{birthday},#{photo},#{remark},#{create_time})
+    </insert>
+    <insert id="addUserRole">
+        insert into jxc_role_user (id,user_id,role_id) values (#{id},#{user_id},#{role_id})
+    </insert>
+    <delete id="delete">
+        delete from jxc_user where id=#{id}
+    </delete>
+
+
+    <select id="selectById" resultType="com.example.demo.entity.User">
+        select * from user where id=#{id}
+    </select>
+    <select id="select" resultType="com.example.demo.entity.User">
+        select * from jxc_user
+        <where>
+            <if test="account!=null and account!=''">
+                and account=#{account}
+            </if>
+            <if test="password!=null and password!=''">
+                and password=#{password}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByRole" resultType="com.example.demo.entity.User">
+        select ju.* from jxc_role_user jru left join jxc_user ju on jru.user_id = ju.id where jru.role_id = #{id}
+    </select>
+
+    <select id="search" resultType="com.example.demo.entity.User">
+        select * from jxc_user
+        <where>
+        <if test="user.name!=null and user.name!=''">
+            name like concat('%',#{user.name},'%')
+        </if>
+        </where>
+        limit #{input.start},#{input.pageSize}
+
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        select count(*) from jxc_user <where>
+        <if test="name!=null and name!=''">
+            name like concat('%',#{name},'%')
+        </if>
+    </where>
+    </select>
+    <select id="selectByRoleFlag" resultType="com.example.demo.entity.User">
+        select ju.* from jxc_user ju left join jxc_role_user jru on ju.id=jru.user_id where jru.role_id=(
+            select id from jxc_role where flag = #{flag})
+    </select>
+    <select id="selectByMenu" resultType="com.example.demo.entity.User">
+       select user_id as id  from  jxc_role_user  where role_id In (select role_id from jxc_menu_role where menu_id = #{id});
+    </select>
+    <select id="getUserByRole" resultType="com.example.demo.entity.User">
+        SELECT u.id, u.name
+        FROM jxc_user u
+                 INNER JOIN jxc_role_user ru ON u.id = ru.user_id
+                 INNER JOIN jxc_role r ON ru.role_id = r.id
+        WHERE r.name = #{roleName};
+    </select>
+
+
+    <update id="update" >
+                update jxc_user
+                <set>
+                    <if test="name!=null and name!=''">
+                         name=#{name},
+                    </if>
+                    <if test="account!=null and account!=''">
+                         account=#{account},
+                    </if>
+                    <if test="password!=null and password!=''">
+                         password=#{password},
+                    </if>
+                    <if test="email!=null and email!=''">
+                         email=#{email},
+                    </if>
+                         birthday=#{birthday}
+                </set>
+                where id=#{id}
+    </update>
+
+</mapper>

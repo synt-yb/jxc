@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.WarehouseInterface">
+
+
+    <insert id="add">
+        INSERT INTO jxc_warehouse (warehouse_id,warehouse_name,location,manager_id,create_time,status,capacity)
+        VALUES (#{warehouse_id},#{warehouse_name},#{location},#{manager_id},#{create_time},#{status},#{capacity})
+    </insert>
+    <select id="show" resultType="com.example.demo.entity.Warehouse">
+        SELECT * FROM jxc_warehouse <where>
+        <if test="warehouse_name!=null and warehouse_name!=''">
+            AND warehouse_name LIKE CONCAT('%',#{warehouse_name},'%')
+        </if>
+    </where>
+    </select>
+    <select id="selectByUserAndRole" resultType="com.example.demo.entity.Warehouse">
+        SELECT warehouse_id, warehouse_name
+        FROM jxc_warehouse
+        WHERE
+        <if test="mainRole=='Purchase'">
+            purchase_id = #{operator_id}
+        </if>
+        <if test="mainRole=='Sale'">
+            sale_id = #{operator_id}
+        </if>
+    </select>
+    <select id="getIdAndName" resultType="com.example.demo.entity.Warehouse">
+        SELECT warehouse_id, warehouse_name FROM jxc_warehouse
+    </select>
+</mapper>

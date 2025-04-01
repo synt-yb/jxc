@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.MaterialInterface">
+
+
+    <insert id="add">
+        INSERT INTO jxc_material(material_id,material_name,category_id,min_stock,shelf_life,box_volume,box_quantity,unit,remark,create_time,administrator_id)
+        VALUES (#{material_id},#{material_name},#{category_id},#{min_stock},#{shelf_life},#{box_volume},#{box_quantity},#{unit},#{remark},#{create_time},#{administrator_id})
+    </insert>
+    <update id="update">
+        update jxc_material
+        <set>
+            <if test="material_name!=null and material_name!=''">
+                material_name=#{material_name},
+            </if>
+            <if test="category_id!=null and category_id!=''">
+                category_id=#{category_id},
+            </if>
+            <if test="min_stock!=null and min_stock!=''">
+                min_stock=#{min_stock},
+            </if>
+            <if test="shelf_life!=null and shelf_life!=''">
+                shelf_life=#{shelf_life},
+            </if>
+            <if test="box_volume!=null and box_volume!=''">
+                box_volume=#{box_volume},
+            </if>
+            <if test="box_quantity!=null and box_quantity!=''">
+                box_quantity=#{box_quantity},
+            </if>
+            <if test="unit!=null and unit!=''">
+                unit=#{unit},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark=#{remark},
+            </if>
+            <if test="administrator_id!=null and administrator_id!=''">
+                administrator_id=#{administrator_id},
+            </if>
+            <if test="update_time!=null">
+                update_time=#{update_time},
+            </if>
+        </set>
+        where material_id=#{material_id}
+    </update>
+    <delete id="delete">
+        DELETE FROM jxc_material WHERE material_id=#{material_id}
+    </delete>
+
+    <select id="show" resultType="material">
+        SELECT m.*,u.name as administrator_name,c.name as category_name
+        FROM jxc_material m
+        INNER JOIN jxc_user u ON u.id = m.administrator_id
+        INNER JOIN jxc_category c ON c.id=m.category_id
+        <where>
+        <if test="material.material_name!=null and material.material_name!=''">
+            AND m.material_name LIKE CONCAT('%',#{material.material_name},'%')
+        </if>
+        <if test="material.category_id!=null and material.category_id!=''">
+            AND m.category_id=#{material.category_id}
+        </if>
+        </where>
+        limit #{input.start},#{input.pageSize}
+    </select>
+    <select id="show_count" resultType="java.lang.Long">
+        SELECT count(*) FROM jxc_material m
+        INNER JOIN jxc_user u ON u.id = m.administrator_id
+        INNER JOIN jxc_category c ON c.id=m.category_id
+        <where>
+            <if test="material_name!=null and material_name!=''">
+                AND m.material_name LIKE CONCAT('%',#{material_name},'%')
+            </if>
+            <if test="category_id!=null and category_id!=''">
+               AND m.category_id=#{category_id}
+            </if>
+        </where>
+    </select>
+    <select id="getDPMsg" resultType="material">
+        SELECT material_id,material_name,shelf_life,
+        CASE
+        WHEN unit NOT LIKE '%/%' THEN CONCAT(box_quantity, unit, '/箱')
+        ELSE CONCAT(unit, '，', box_quantity, SUBSTRING(unit FROM LOCATE('/', unit)+1), '/箱')
+        END AS volume_per_unit
+        FROM jxc_material
+        <where>
+            <if test="category_id!=null and category_id!=''">
+                AND category_id=#{category_id}
+            </if>
+            <if test="material_name!=null and material_name!=''">
+                AND material_name LIKE CONCAT('%',#{material_name},'%')
+            </if>
+        </where>
+    </select>
+
+
+    <resultMap id="resMaterial" type="com.example.demo.entity.Material">
+        <id column="material_id" property="material_id"/>
+        <result column="u.name" property="administrator_name"/>
+        <result column="c.name" property="category_name"/>
+    </resultMap>
+</mapper>

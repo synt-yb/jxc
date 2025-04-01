@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.RoleInterface">
+
+    <insert id="add">
+        INSERT INTO jxc_role (id,name,flag) VALUES (#{id},#{name},#{flag})
+    </insert>
+
+    <delete id="delete">
+        delete from jxc_role where id=#{id}
+    </delete>
+    <delete id="cancelRole">
+        delete from jxc_role_user where user_id=#{id}
+    </delete>
+    <delete id="cancelRole2">
+        delete from jxc_role_user where role_id=#{id}
+    </delete>
+
+    <update id="update">
+        update jxc_role set name=#{name},flag=#{flag} where id=#{id}
+    </update>
+
+
+    <select id="getRoleByUser" resultType="com.example.demo.entity.Role">
+        select jr.* from jxc_role_user jru left join jxc_role jr on jru.role_id = jr.id where jru.user_id = #{id}
+    </select>
+
+
+    <select id="getAll" resultType="com.example.demo.entity.Role">
+        select * from jxc_role
+    </select>
+    <select id="select" resultType="com.example.demo.entity.Role">
+        select * from jxc_role
+            <where>
+                <if test="name!=null and name !=''">
+                    name like concat('%',#{name},'%')
+                </if>
+                <if test="flag!=null and flag !=''">
+                    and flag=#{flag}
+                </if>
+            </where>
+
+    </select>
+
+</mapper>

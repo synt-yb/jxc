@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.InventoryInterface">
+
+
+    <insert id="add" parameterType="java.util.List">
+        INSERT INTO jxc_inventory(inventory_id,warehouse_id,material_id,quantity,production_date,purchase_price)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.inventory_id},#{item.warehouse_id},#{item.material_id},#{item.quantity},
+             #{item.production_date},#{item.purchase_price})
+        </foreach>
+    </insert>
+    <select id="show" resultType="com.example.demo.entity.Inventory">
+        SELECT i.*,w.warehouse_name,m.material_name,m.shelf_life,c.name as category_name,
+        IF(m.unit NOT LIKE '%/%', CONCAT(m.box_quantity, m.unit, '/箱'),
+        CONCAT(m.unit, '，', m.box_quantity, SUBSTRING(m.unit FROM LOCATE('/', m.unit) + 1),'/箱')) AS volume_per_unit
+        FROM jxc_inventory i
+                 INNER JOIN jxc_warehouse w ON i.warehouse_id = w.warehouse_id
+                 INNER JOIN jxc_material m ON i.material_id = m.material_id
+                 INNER JOIN jxc_category c ON m.category_id = c.id
+        WHERE i.warehouse_id = #{warehouse_id}
+        <if test="category_id != null and category_id != ''">
+            AND c.id = #{category_id}
+        </if>
+        ORDER BY i.material_id,i.production_date DESC
+    </select>
+</mapper>
