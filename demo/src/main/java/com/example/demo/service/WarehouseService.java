@@ -69,5 +69,9 @@ public class WarehouseService {
         return warehouseInterface.getIdAndName();
     }
 
+    public String getNameById(String id) {
+        return warehouseInterface.getNameById(id);
+    }
+
 
 }

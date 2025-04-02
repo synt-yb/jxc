@@ -30,4 +30,7 @@
     <select id="getIdAndName" resultType="com.example.demo.entity.Warehouse">
         SELECT warehouse_id, warehouse_name FROM jxc_warehouse
     </select>
+    <select id="getNameById" resultType="java.lang.String">
+        SELECT warehouse_name FROM jxc_warehouse WHERE warehouse_id = #{warehouse_id}
+    </select>
 </mapper>

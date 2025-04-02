@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface WarehouseInterface {
 
+    String getNameById(String id);
+
     boolean add(Warehouse warehouse);
 
     List<Warehouse> show(Warehouse warehouse);

@@ -1,11 +1,15 @@
 package com.example.demo.entity;
 
+import com.example.demo.until.DateUntils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class Inventory {
@@ -25,4 +29,26 @@ public class Inventory {
     private String category_name;
     private String volume_per_unit;
     private Integer shelf_life;
+
+    public List<String> getAllInventoryInfo()
+    {
+        return new ArrayList<>(Arrays.asList(
+                getMaterial_name(),
+                getCategory_name(),
+                getVolume_per_unit(),
+                getPurchase_price().toString(),
+                String.valueOf(getQuantity()),
+                DateUntils.formatDate(getProduction_date(), "yyyy-MM-dd hh:mm:ss"),
+                String.valueOf(getShelf_life()))
+        );
+    }
+    public List<String> getPartInventoryInfo()
+    {
+        return new ArrayList<>(Arrays.asList(
+                getPurchase_price().toString(),
+                String.valueOf(getQuantity()),
+                DateUntils.formatDate(getProduction_date(), "yyyy-MM-dd hh:mm:ss"),
+                String.valueOf(getShelf_life()))
+        );
+    }
 }

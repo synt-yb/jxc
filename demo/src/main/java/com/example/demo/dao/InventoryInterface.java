@@ -9,4 +9,6 @@ public interface InventoryInterface {
     boolean add(List<Inventory> inventoryList);
 
     List<Inventory> show(Inventory inventory);
+
+
 }
