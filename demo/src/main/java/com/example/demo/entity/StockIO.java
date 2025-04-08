@@ -3,12 +3,16 @@ package com.example.demo.entity;
 import com.example.demo.enums.StockIoStatus;
 import com.example.demo.enums.StockIoSubType;
 import com.example.demo.enums.StockIoType;
+import com.example.demo.validation.orderSubmitGroup;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,32 +22,46 @@ import java.util.UUID;
 
 @Data
 public class StockIO {
+
     private String stock_io_id;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('IN', 'OUT')")
     private StockIoType type;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('DP', 'TR', 'SE', 'DE')")
     private StockIoSubType sub_type;
+
     private String from_warehouse_id;
+
     private String to_warehouse_id;
+
     private String operator_id;
+
+    @NotNull(message = "出入库时间不能为空", groups = orderSubmitGroup.class)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date io_time;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('DRAFT', 'PENDING', 'APPROVED', 'REJECTED')")
     private StockIoStatus status;
+
     private String auditor_id;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date audit_time;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date create_time;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date update_time;
+
     private String remark;
 
     // 拓展页面显示字段
@@ -54,6 +72,7 @@ public class StockIO {
     private BigDecimal total_price;
 
     // 拓展字段
+    @Size(min = 1, message = "请至少选择一项入库商品", groups = orderSubmitGroup.class)
     private List<StockIODetail> stockIODetail;
 
     // 构造函数

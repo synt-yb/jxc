@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.*;
 import com.example.demo.service.StockIOService;
+import com.example.demo.validation.orderSubmitGroup;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +20,7 @@ public class StockIOController {
     private StockIOService stockIOService;
 
     @PostMapping("addDpIO")
-    public ResponseInfo addDpIO(@RequestBody StockIO stockIO) {
+    public ResponseInfo addDpIO(@Validated(orderSubmitGroup.class) @RequestBody StockIO stockIO) {
         return stockIOService.addDpIO(stockIO);
     }
 

@@ -1,0 +1,47 @@
+<configuration>
+    <!-- 定义控制台输出的 appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 定义文件输出的 appender，用于记录出入库信息 -->
+    <appender name="STOCK_IO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>stock_io.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>stock_io.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 定义文件输出的 appender，用于记录异常信息 -->
+    <appender name="EXCEPTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>exception.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>exception.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 根日志记录器，将日志输出到控制台 -->
+    <root level="info">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- 自定义日志记录器，用于记录出入库信息 -->
+    <logger name="stock.io" level="info" additivity="false">
+        <appender-ref ref="STOCK_IO_FILE" />
+    </logger>
+
+    <!-- 自定义日志记录器，用于记录异常信息 -->
+    <logger name="stock.exception" level="error" additivity="false">
+        <appender-ref ref="EXCEPTION_FILE" />
+    </logger>
+</configuration>
