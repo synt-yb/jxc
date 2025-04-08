@@ -58,12 +58,12 @@
  const login = () => {
     
     //前端验证
-    if(user.value.account==''||user.value.password==''){
-       ElMessage.error('账号或密码不能为空')
-       return
-    }
+    // if(user.value.account==''||user.value.password==''){
+    //    ElMessage.error('账号或密码不能为空')
+    //    return
+    // }
     //传入后端
-    http.post('/user/login',user.value).then(res=>{
+    http.post('/user/login',user.value,JSON).then(res=>{
       if(res.code === 200){
         //保存账号密码  保存用户信息和token
         if(isRemember.value){

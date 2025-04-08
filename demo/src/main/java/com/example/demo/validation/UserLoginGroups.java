@@ -1,4 +1,4 @@
 package com.example.demo.validation;
 
-public interface orderSubmitGroup {
+public interface UserLoginGroups {
 }

@@ -3,14 +3,15 @@ package com.example.demo.entity;
 import com.example.demo.enums.StockIoStatus;
 import com.example.demo.enums.StockIoSubType;
 import com.example.demo.enums.StockIoType;
-import com.example.demo.validation.orderSubmitGroup;
+import com.example.demo.validation.orderSubmitGroups.orderSubmitGroup1;
+import com.example.demo.validation.orderSubmitGroups.orderSubmitGroup2;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
@@ -39,7 +40,7 @@ public class StockIO {
 
     private String operator_id;
 
-    @NotNull(message = "出入库时间不能为空", groups = orderSubmitGroup.class)
+    @NotNull(message = "出入库时间不能为空", groups = orderSubmitGroup1.class)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date io_time;
@@ -72,7 +73,8 @@ public class StockIO {
     private BigDecimal total_price;
 
     // 拓展字段
-    @Size(min = 1, message = "请至少选择一项入库商品", groups = orderSubmitGroup.class)
+    @Valid
+    @Size(min = 1, message = "请至少选择一项入库商品", groups = orderSubmitGroup2.class)
     private List<StockIODetail> stockIODetail;
 
     // 构造函数

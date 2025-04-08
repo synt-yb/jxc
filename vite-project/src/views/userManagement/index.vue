@@ -182,7 +182,7 @@ const openDialog = (str, data) => {
 // 添加角色
 const addUser = () => {
 
-    http.post('/user/add', userParm.value).then(res => {
+    http.post('/user/add', userParm.value,JSON).then(res => {
         if (res.code == 200) {
             ElMessage.success('添加成功')
             addDialog.value.visible = false
