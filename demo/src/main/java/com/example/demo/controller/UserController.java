@@ -6,7 +6,7 @@ import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import com.example.demo.validation.UserAddGroups;
 import com.example.demo.validation.UserLoginGroups;
-import org.springframework.util.StringUtils;
+import com.example.demo.validation.UserUpdateGroups;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -47,9 +47,7 @@ public class UserController {
     }
 
     @PostMapping("update")
-    public ResponseInfo update(User user) {
-        if (!StringUtils.hasLength(user.getAccount())||!StringUtils.hasLength(user.getName()))
-            return ResponseInfo.error(400,"账号和姓名不能为空");
+    public ResponseInfo update(@Validated(UserUpdateGroups.class) User user) {
         return userService.update(user);
     }
 

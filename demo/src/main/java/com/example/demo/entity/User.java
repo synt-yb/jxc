@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import com.example.demo.validation.UserAddGroups;
 import com.example.demo.validation.UserLoginGroups;
+import com.example.demo.validation.UserUpdateGroups;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,10 +14,10 @@ import java.util.Date;
 public class User {
     private String id;
 
-    @Size(min = 1, message = "请输入账号", groups = {UserAddGroups.class, UserLoginGroups.class})
+    @Size(min = 1, message = "请输入账号", groups = {UserAddGroups.class, UserLoginGroups.class, UserUpdateGroups.class})
     private String account;
 
-    @Size(min = 1, message = "请输入用户名", groups = UserAddGroups.class)
+    @Size(min = 1, message = "用户名不为空", groups = {UserAddGroups.class, UserUpdateGroups.class})
     private String name;
 
     @Size(min = 1, message = "请输入密码", groups = UserLoginGroups.class)
