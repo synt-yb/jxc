@@ -16,19 +16,9 @@
 
 
     <select id="selectById" resultType="com.example.demo.entity.User">
-        select * from user where id=#{id}
+        select * from jxc_user where id=#{id}
     </select>
-    <select id="select" resultType="com.example.demo.entity.User">
-        select * from jxc_user
-        <where>
-            <if test="account!=null and account!=''">
-                and account=#{account}
-            </if>
-            <if test="password!=null and password!=''">
-                and password=#{password}
-            </if>
-        </where>
-    </select>
+
 
     <select id="selectByRole" resultType="com.example.demo.entity.User">
         select ju.* from jxc_role_user jru left join jxc_user ju on jru.user_id = ju.id where jru.role_id = #{id}
@@ -65,6 +55,11 @@
                  INNER JOIN jxc_role_user ru ON u.id = ru.user_id
                  INNER JOIN jxc_role r ON ru.role_id = r.id
         WHERE r.name = #{roleName};
+    </select>
+
+
+    <select id="selectLoginMessage" resultType="com.example.demo.entity.User">
+        select id, account,name,password from jxc_user where account=#{account}
     </select>
 
 

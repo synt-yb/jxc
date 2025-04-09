@@ -3,16 +3,14 @@ import com.example.demo.config.redis.RedisUtil;
 import com.example.demo.dao.RoleInterface;
 import com.example.demo.dao.UserInterface;
 import com.example.demo.entity.*;
-import com.example.demo.filter.TokenFilter;
+import com.example.demo.config.jwt.JwtTokenUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -21,24 +19,32 @@ public class UserService {
     RedisUtil redisUtil;
 
     @Resource
+    PasswordEncoder passwordEncoder;
+
+    @Resource
     UserInterface userInterface;
 
     @Resource
     RoleInterface roleInterface;
 
     @Resource
+    JwtTokenUtil jwtTokenUtil;
+
+    @Resource
             @Lazy
     RoleService roleService;
 
 
-
+    /**
+     * 登录功能
+     */
     public ResponseInfo login(User user) {
-        User res=userInterface.select(user);
-        if(res != null){
+        User userRes = userInterface.selectLoginMessage(user);
+        if (passwordEncoder.matches(user.getPassword(),userRes.getPassword())){
             Map<String, Object> map = new HashMap<>();
-            map.put("token", TokenFilter.getToken(res.getId()));
-            map.put("id",res.getId());
-            map.put("name",res.getName());
+            map.put("token", jwtTokenUtil.generateToken(userRes.getId()));
+            map.put("id",userRes.getId());
+            map.put("name",userRes.getName());
             return ResponseInfo.success(map);
         }else {
             return ResponseInfo.error(400,"账号或密码错误");
@@ -51,7 +57,6 @@ public class UserService {
         User user = userInterface.selectById(id);
         if (user == null)
             return ResponseInfo.error(400,"用户不存在");
-
         return ResponseInfo.success(userInterface.selectById(id));
     }
 
@@ -78,9 +83,13 @@ public class UserService {
         return ResponseInfo.success(map);
     }
 
+    /**
+     * 添加用户
+     */
     public ResponseInfo add(User user) {
         user.setId(UUID.randomUUID().toString().replace("-", ""));
-        user.setPassword("123456");
+        user.setPassword(passwordEncoder.encode("123456"));
+        System.out.println(user.getPassword());
         try {
             userInterface.add(user);
         }catch (DataIntegrityViolationException e){
@@ -159,9 +168,7 @@ public class UserService {
 
     }
 
-    public List<User> selectByRoleFlag(Role role) {
-        return userInterface.selectByRoleFlag(role);
-    }
+
 
     public List<User> selectByRole(Role role) {
         return userInterface.selectByRole(role);

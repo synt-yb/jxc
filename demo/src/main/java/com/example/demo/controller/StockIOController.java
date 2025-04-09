@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.entity.*;
 import com.example.demo.service.StockIOService;
 import com.example.demo.validation.orderSubmitGroups.orderSubmitGroup;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +42,9 @@ public class StockIOController {
             return ResponseInfo.error(400,"请填写出入库时间");
         return stockIOService.update(stockIO);
     }
+
+
+    @PreAuthorize("hasRole('ROLE_SALE') or hasRole('ROLE_PURCHASE') ")
     @PostMapping("show")
     public ResponseInfo show(String operator_id,StockIO stockIO,RequestInfo input) {
         return stockIOService.show(operator_id,stockIO,input);

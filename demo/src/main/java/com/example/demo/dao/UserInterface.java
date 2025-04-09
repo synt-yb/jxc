@@ -15,7 +15,7 @@ public interface UserInterface {
 
     List<User> selectByRole(Role role);
 
-    User select(User user);
+    User selectLoginMessage(User user);
 
     User selectById(String id);
 
@@ -33,4 +33,7 @@ public interface UserInterface {
     List<User> selectByMenu(Menu menu);
 
     List<User> getUserByRole(String roleName);
+
+
+
 }

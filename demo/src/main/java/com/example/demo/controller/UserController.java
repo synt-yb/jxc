@@ -7,6 +7,7 @@ import com.example.demo.service.UserService;
 import com.example.demo.validation.UserAddGroups;
 import com.example.demo.validation.UserLoginGroups;
 import com.example.demo.validation.UserUpdateGroups;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -56,6 +57,7 @@ public class UserController {
         return userService.getUserPower(user);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("show")
     public ResponseInfo show(User user, RequestInfo input){
         return userService.show(user, input);

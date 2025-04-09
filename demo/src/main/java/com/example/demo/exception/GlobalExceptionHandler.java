@@ -1,5 +1,7 @@
 package com.example.demo.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -38,4 +40,13 @@ public class GlobalExceptionHandler {
 
         return ResponseInfo.error(400, errorMessage);
     }
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseInfo handleAccessDenied(AccessDeniedException e) {
+            return ResponseInfo.error(403, "无权限！");
+        }
+
+
+
+
 }

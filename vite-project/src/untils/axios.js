@@ -18,7 +18,7 @@ service.interceptors.request.use(
     //发请求前做的一些处理，数据转化，配置请求头，设置token,设置loading等，根据需求去添加
     const token = localStorage.getItem("token")
     if (token) {
-      config.headers.token = token; //如果要求携带在请求头中
+      config.headers.Authorization = 'Bearer '+token; //如果要求携带在请求头中
     }
     return config;
   },
@@ -32,6 +32,7 @@ service.interceptors.response.use(
   (response) => {
     //接收到响应数据并成功后的一些共有的处理，关闭loading等
     if (response && response.data) {
+      
       const res = response.data;
       if (res.code != 200) {
         ElMessage({
@@ -39,7 +40,7 @@ service.interceptors.response.use(
           type: 'error',
         })
       }
-      if(res.code==333){
+      if(res.code==401){
         localStorage.removeItem('token')
         localStorage.removeItem('menuStore')
         router.replace('/login')
